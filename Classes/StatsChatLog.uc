@@ -25,13 +25,13 @@ function Init()
 
 function Broadcast( Actor Sender, coerce string Msg, optional name Type )
 {
-  if ((Controller(Sender) != none) && (statslog != none)) statslog.ChatEvent("VT", Controller(Sender).PlayerReplicationInfo, msg);
+  if ((Controller(Sender) != none) && (statslog != none)) statslog.ChatEvent("V", Controller(Sender).PlayerReplicationInfo, msg);
   if (oldHandler != none) oldHandler.Broadcast(Sender, Msg, Type);
 }
 
 function BroadcastTeam( Controller Sender, coerce string Msg, optional name Type )
 {
-  if (statslog != none) statslog.ChatEvent("VT", Sender.PlayerReplicationInfo, msg);
+  if (statslog != none) statslog.ChatEvent("TV", Sender.PlayerReplicationInfo, msg);
   if (oldHandler != none) oldHandler.BroadcastTeam(Sender, Msg, Type);
 }
 
