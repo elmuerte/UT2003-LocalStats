@@ -21,6 +21,7 @@ var globalconfig string sLogDir;
 var globalconfig bool bFixEmptyLog;
 var globalconfig string sFileFormat;
 var globalconfig class<RemoteStats> RemoteStatsClass;
+var globalconfig bool bEndGameFix;
 
 function NewInit()
 {
@@ -59,6 +60,14 @@ function NewInit()
     ChatLog = spawn(class'StatsChatLog');
     ChatLog.statslog = Self;
     ChatLog.Init();
+    if (bEndGameFix)
+    {
+      ChatLog.bUseRemote = bUseRemote;
+      ChatLog.bFixEmptyLog = bFixEmptyLog;
+      ChatLog.bShowBots = bShowBots;
+      if (!bUseRemote) ChatLog.logname = logname;        
+      else ChatLog.uplink = uplink;      
+    }
   }
   log("[~] Michiel 'El Muerte' Hendriks - elmuerte@drunksnipers.com", 'LocalStats');
   log("[~] The Drunk Snipers - http://www.drunksnipers.com", 'LocalStats');
@@ -80,6 +89,12 @@ function string GetServerPort()
     i = InStr( S, ":" );
     assert(i>=0);
     return Mid(S,i+1);
+}
+
+function Shutdown()
+{
+	super.Shutdown();
+  if (bLogChat && bEndGameFix) ChatLog.EngGameLogging();
 }
 
 function Logf(string LogString)
@@ -171,4 +186,5 @@ defaultproperties
   bFixEmptyLog=false
   RemoteStatsClass=class'RemoteStats'
   sFileFormat="LocalStats_%P_%Y_%M_%D_%H_%I_%S"
+  bEndGameFix=false
 }
