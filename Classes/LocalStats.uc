@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // filename:    LocalStats.uc
-// version:     105
+// version:     106
 // author:      Michiel 'El Muerte' Hendriks <elmuerte@drunksnipers.com>
 // purpose:     enable local stats logging, and still make worldstats logging 
 //              available
@@ -8,7 +8,7 @@
 
 class LocalStats extends GameStats config;
 
-const VERSION = "105";
+const VERSION = "106";
 
 var string logname;
 var GameStats OldGameStats;
