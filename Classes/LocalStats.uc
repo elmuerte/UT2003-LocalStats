@@ -19,6 +19,7 @@ var globalconfig bool bUseRemote;
 var globalconfig bool bLogChat;
 var globalconfig string sLogDir;
 var globalconfig bool bFixEmptyLog;
+var globalconfig string sFileFormat;
 var globalconfig class<RemoteStats> RemoteStatsClass;
 
 function NewInit()
@@ -34,7 +35,8 @@ function NewInit()
   Level.Game.GameStats = Self;
   if (!bUseRemote)
   {
-    logname = sLogDir$"LocalStats_"$GetServerPort()$"_"$Level.Year$"_"$Level.Month$"_"$Level.Day$"_"$Level.Hour$"_"$Level.Minute$"_"$Level.Second;
+    //logname = sLogDir$"LocalStats_"$GetServerPort()$"_"$Level.Year$"_"$Level.Month$"_"$Level.Day$"_"$Level.Hour$"_"$Level.Minute$"_"$Level.Second;
+    logname = LogFilename();
 	  TempLog = spawn(class 'FileLog');
   	if (TempLog!=None)
 	  {
@@ -141,6 +143,21 @@ function ChatEvent(coerce string type, PlayerReplicationInfo Who, coerce string 
 	Logf2(out);
 }
 
+function string LogFilename()
+{
+  local string result;
+  result = sFileFormat;
+  ReplaceText(result, "%P", GetServerPort());
+  ReplaceText(result, "%N", Level.Game.GameReplicationInfo.ServerName);
+  ReplaceText(result, "%Y", Right("00"$string(Level.Year), 2));
+  ReplaceText(result, "%M", Right("00"$string(Level.Month), 2));
+  ReplaceText(result, "%D", Right("00"$string(Level.Day), 2));
+  ReplaceText(result, "%H", Right("00"$string(Level.Hour), 2));
+  ReplaceText(result, "%I", Right("00"$string(Level.Minute), 2));
+  ReplaceText(result, "%S", Right("00"$string(Level.Second), 2));
+  return sLogDir$result;
+}
+
 defaultproperties
 {
   bUseRemote=false
@@ -148,4 +165,5 @@ defaultproperties
   sLogDir=""
   bFixEmptyLog=false
   RemoteStatsClass=class'RemoteStats'
+  sFileFormat="LocalStats_%P_%Y_%M_%D_%H_%I_%S"
 }
