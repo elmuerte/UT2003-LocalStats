@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // filename:    LocalStats.uc
-// version:     104
+// version:     105
 // author:      Michiel 'El Muerte' Hendriks <elmuerte@drunksnipers.com>
 // purpose:     enable local stats logging, and still make worldstats logging 
 //              available
@@ -8,7 +8,7 @@
 
 class LocalStats extends GameStats config;
 
-const VERSION = "104";
+const VERSION = "105";
 
 var string logname;
 var GameStats OldGameStats;
@@ -35,7 +35,6 @@ function NewInit()
   Level.Game.GameStats = Self;
   if (!bUseRemote)
   {
-    //logname = sLogDir$"LocalStats_"$GetServerPort()$"_"$Level.Year$"_"$Level.Month$"_"$Level.Day$"_"$Level.Hour$"_"$Level.Minute$"_"$Level.Second;
     logname = LogFilename();
 	  TempLog = spawn(class 'FileLog');
   	if (TempLog!=None)
@@ -149,11 +148,12 @@ function string LogFilename()
   result = sFileFormat;
   ReplaceText(result, "%P", GetServerPort());
   ReplaceText(result, "%N", Level.Game.GameReplicationInfo.ServerName);
-  ReplaceText(result, "%Y", Right("00"$string(Level.Year), 2));
+  ReplaceText(result, "%Y", Right("0000"$string(Level.Year), 4));
   ReplaceText(result, "%M", Right("00"$string(Level.Month), 2));
   ReplaceText(result, "%D", Right("00"$string(Level.Day), 2));
   ReplaceText(result, "%H", Right("00"$string(Level.Hour), 2));
   ReplaceText(result, "%I", Right("00"$string(Level.Minute), 2));
+  ReplaceText(result, "%W", Right("0"$string(Level.DayOfWeek), 1));
   ReplaceText(result, "%S", Right("00"$string(Level.Second), 2));
   return sLogDir$result;
 }
