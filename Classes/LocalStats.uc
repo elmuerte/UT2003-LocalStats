@@ -12,8 +12,14 @@ const VERSION = "103";
 
 var string logname;
 var GameStats OldGameStats;
-var globalconfig bool bUseRemote;
 var RemoteStats uplink;
+var StatsChatLog ChatLog;
+
+var globalconfig bool bUseRemote;
+var globalconfig bool bLogChat;
+var globalconfig string sLogDir;
+var globalconfig bool bFixEmptyLog;
+var globalconfig class<RemoteStats> RemoteStatsClass;
 
 function NewInit()
 {
@@ -28,7 +34,7 @@ function NewInit()
   Level.Game.GameStats = Self;
   if (!bUseRemote)
   {
-    logname = "LocalStats_"$GetServerPort()$"_"$Level.Year$"_"$Level.Month$"_"$Level.Day$"_"$Level.Hour$"_"$Level.Minute$"_"$Level.Second;
+    logname = sLogDir$"LocalStats_"$GetServerPort()$"_"$Level.Year$"_"$Level.Month$"_"$Level.Day$"_"$Level.Hour$"_"$Level.Minute$"_"$Level.Second;
 	  TempLog = spawn(class 'FileLog');
   	if (TempLog!=None)
 	  {
@@ -39,12 +45,19 @@ function NewInit()
 	  {
 		  log("[E] Could not spawn Temporary Stats log");
   		Destroy();
+      return;
 	  }
   }
   else {
   	log("[~] Spawned for remote logging");
-    uplink = spawn(class'RemoteStats');
+    uplink = spawn(RemoteStatsClass);
     uplink.Init();
+  }
+  if (bLogChat)
+  {
+    ChatLog = spawn(class'StatsChatLog');
+    ChatLog.statslog = Self;
+    ChatLog.Init();
   }
   log("[~] Michiel 'El Muerte' Hendriks - elmuerte@drunksnipers.com");
   log("[~] The Drunk Snipers - http://www.drunksnipers.com");
@@ -78,7 +91,15 @@ function Logf2(string LogString)
 {
   if (uplink == None)
   {
-    if (TempLog!=None) TempLog.Logf(LogString);
+    if (TempLog!=None) 
+    {
+      TempLog.Logf(LogString);
+      if (bFixEmptyLog)
+      {
+        TempLog.CloseLog();
+        TempLog.OpenLog(logname);
+      }
+    }
   }
   else {
   	uplink.RemoteLogf(LogString);
@@ -112,7 +133,19 @@ event PreBeginPlay()
   }
 }
 
+function ChatEvent(coerce string type, PlayerReplicationInfo Who, coerce string Message)
+{
+  local string out;
+	if ( (Who.bBot && !bShowBots) || Who.bOnlySpectator ) return;
+	out = ""$Header()$type$Chr(9)$Controller(Who.Owner).PlayerNum$Chr(9)$Message;
+	Logf2(out);
+}
+
 defaultproperties
 {
-  bUseRemote=false;
+  bUseRemote=false
+  bLogChat=false
+  sLogDir=""
+  bFixEmptyLog=false
+  RemoteStatsClass=class'RemoteStats'
 }
