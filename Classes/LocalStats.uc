@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // filename:    LocalStats.uc
-// version:     102
+// version:     103
 // author:      Michiel 'El Muerte' Hendriks <elmuerte@drunksnipers.com>
 // purpose:     enable local stats logging, and still make worldstats logging 
 //              available
@@ -8,7 +8,7 @@
 
 class LocalStats extends GameStats config;
 
-const VERSION = "102";
+const VERSION = "103";
 
 var string logname;
 var GameStats OldGameStats;
@@ -20,7 +20,11 @@ function NewInit()
   Level.Game.bLoggingGame = true;
   Level.Game.bEnableStatLogging = true;
   log("[~] Starting LocalStats version "$VERSION);
-  if (Level.Game.GameStats != None) OldGameStats = Level.Game.GameStats;
+  if (Level.Game.GameStats != None) 
+  {
+    OldGameStats = Level.Game.GameStats;
+    log("[~] Found WorldStats actor"@OldGameStats);
+  }
   Level.Game.GameStats = Self;
   if (!bUseRemote)
   {
@@ -92,7 +96,10 @@ function ConnectEvent(PlayerReplicationInfo Who)
 	out = ""$Header()$"C"$Chr(9)$Controller(Who.Owner).PlayerNum$Chr(9)$Who.PlayerName;
 
 	Logf2(out);
-  if (OldGameStats!=None) OldGameStats.ConnectEvent(Who);
+  //if (OldGameStats!=None) OldGameStats.ConnectEvent(Who);
+  // well add a second Connect line
+  // C playerid stats_idhash stats_nick stats_passhash
+  Super.ConnectEvent(Who);
 }
 
 // has to be called before the game starts
