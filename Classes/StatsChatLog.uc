@@ -14,13 +14,13 @@ function Init()
 {
   if (statslog == none)
   {
-    log("[E] Error initialising StatsChatLog");
+    log("[E] Error initialising StatsChatLog", 'LocalStats');
     Destroy();
     return;
   }
   oldHandler = Level.Game.BroadcastHandler;
   Level.Game.BroadcastHandler = Self;
-  log("[~] Chat logging enabled");
+  log("[~] Chat logging enabled", 'LocalStats');
 }
 
 function Broadcast( Actor Sender, coerce string Msg, optional name Type )

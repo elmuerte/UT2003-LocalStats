@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // filename:    LocalStats.uc
-// version:     106
+// version:     107
 // author:      Michiel 'El Muerte' Hendriks <elmuerte@drunksnipers.com>
 // purpose:     enable local stats logging, and still make worldstats logging 
 //              available
@@ -8,7 +8,7 @@
 
 class LocalStats extends GameStats config;
 
-const VERSION = "106";
+const VERSION = "107";
 
 var string logname;
 var GameStats OldGameStats;
@@ -26,11 +26,11 @@ function NewInit()
 {
   Level.Game.bLoggingGame = true;
   Level.Game.bEnableStatLogging = true;
-  log("[~] Starting LocalStats version "$VERSION);
+  log("[~] Starting LocalStats version "$VERSION, 'LocalStats');
   if (Level.Game.GameStats != None) 
   {
     OldGameStats = Level.Game.GameStats;
-    log("[~] Found WorldStats actor"@OldGameStats);
+    log("[~] Found WorldStats actor"@OldGameStats, 'LocalStats');
   }
   Level.Game.GameStats = Self;
   if (!bUseRemote)
@@ -40,17 +40,17 @@ function NewInit()
   	if (TempLog!=None)
 	  {
 		  TempLog.OpenLog(logname);
-  		log("[~] Output Game stats to: "$logname$".txt");
+  		log("[~] Output Game stats to: "$logname$".log", 'LocalStats');
 	  }
   	else
 	  {
-		  log("[E] Could not spawn Temporary Stats log");
+		  log("[E] Could not spawn Temporary Stats log", 'LocalStats');
   		Destroy();
       return;
 	  }
   }
   else {
-  	log("[~] Spawned for remote logging");
+  	log("[~] Spawned for remote logging", 'LocalStats');
     uplink = spawn(RemoteStatsClass);
     uplink.Init();
   }
@@ -60,8 +60,8 @@ function NewInit()
     ChatLog.statslog = Self;
     ChatLog.Init();
   }
-  log("[~] Michiel 'El Muerte' Hendriks - elmuerte@drunksnipers.com");
-  log("[~] The Drunk Snipers - http://www.drunksnipers.com");
+  log("[~] Michiel 'El Muerte' Hendriks - elmuerte@drunksnipers.com", 'LocalStats');
+  log("[~] The Drunk Snipers - http://www.drunksnipers.com", 'LocalStats');
 }
 
 function Init()
@@ -155,7 +155,12 @@ function string LogFilename()
   ReplaceText(result, "%I", Right("00"$string(Level.Minute), 2));
   ReplaceText(result, "%W", Right("0"$string(Level.DayOfWeek), 1));
   ReplaceText(result, "%S", Right("00"$string(Level.Second), 2));
-  return sLogDir$result;
+  if (int(level.EngineVersion) > 2222)
+  {
+    if (sLogDir != "") Log("[E] sLogDir is no longer supported in UT2003 version 2222 and up", 'LocalStats');
+    return result;
+  }
+  else return sLogDir$result;
 }
 
 defaultproperties
